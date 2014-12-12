@@ -29,8 +29,6 @@ namespace SitefinityWebApp
             if (e.CommandName == "Bootstrapped")
             {
                 RegisterRoutes(RouteTable.Routes);
-
-                Config.RegisterSection<KrakenConfig>();
             }
         }
 

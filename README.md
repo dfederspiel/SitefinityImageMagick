@@ -1,17 +1,16 @@
-#SitefinityKrakenIO
+#SitefinityImageMagick
 
 This is not a standalone project.
 
-The files in this repository are an example of how to integrate Telerik Sitefinity CMS and Kraken.IO. You'll want to make sure you don't overwrite anything you already have going in your project. _(I'm specifically talking about what's in the Global.asax.cs)_
+The files in this repository are an example of how to integrate Telerik Sitefinity CMS and Magick.NET. You'll want to make sure you don't overwrite anything you already have going in your project. _(I'm specifically talking about what's in the Global.asax.cs)_
 
-This customization adds the ability to batch optimize entire Sitefinity albums using [Kraken.io](https://kraken.io/).
+This customization adds the ability to batch optimize entire Sitefinity albums using Magick.NET (https://magick.codeplex.com/documentation)(http://imagemagick.net/)
+Magick.net is included in the bin, it is the AnyCPU version using nuget you can get it or any other version of it.
 
 ##Dependencies
 
-* Json.NET
-* RestSharp
+* Magick.NET-AnyCPU
 
-If you'd like, you can remove the dependencies by modifying the way Kraken.cs and AlbumOptimizationTask.cs handle the HTTPy/JSONy bits.
 
 ##How to hook everything up
 
@@ -77,9 +76,5 @@ Here are the values to register the script:
 
 ###Once everything is hooked up
 * Build
-* Head over to [Kraken.io](https://kraken.io/) and register for an account.
-* Enter your API Key and API Secret in the new "Kraken" configuration section. _(Administration -> Settings -> Advanced -> Kraken)_
 * Optimize albums
 * Regenerate thumbnails
-
-**Note:** By default **Lossy optimization** is turned off but it's worth turning on if you want to really optimize the images. Check out [the docs](https://kraken.io/docs/lossy-optimization) to see if it's something you're interested in.
