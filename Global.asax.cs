@@ -1,4 +1,5 @@
-﻿using SitefinityWebApp.Custom.AlbumOptimization;
+﻿using Aptera.Sitefinity.Decorators;
+using SitefinityWebApp.Custom.AlbumOptimization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,16 @@ using System.Web.Http;
 using System.Web.Routing;
 using System.Web.Security;
 using System.Web.SessionState;
+using Telerik.Sitefinity;
 using Telerik.Microsoft.Practices.Unity;
 using Telerik.Sitefinity.Abstractions;
 using Telerik.Sitefinity.Configuration;
 using Telerik.Sitefinity.Data;
+using Telerik.Sitefinity.GenericContent.Model;
+using Telerik.Sitefinity.Lifecycle;
+using Telerik.Sitefinity.Modules.Libraries;
 using Telerik.Sitefinity.Modules.Libraries.ImageProcessing;
+using Telerik.Sitefinity.Libraries.Model;
 
 namespace SitefinityWebApp
 {
@@ -29,6 +35,21 @@ namespace SitefinityWebApp
             if (e.CommandName == "Bootstrapped")
             {
                 RegisterRoutes(RouteTable.Routes);
+
+			 ObjectFactory.Container.RegisterType<ILifecycleDecorator, DocumentsDecorator>(typeof(LibrariesManager).FullName,
+			    new InjectionConstructor(
+				   new InjectionParameter<ILifecycleManager>(null),
+				   new InjectionParameter<Action<Content, Content>>(null),
+				   new InjectionParameter<Type[]>(null)));
+
+			 Config.RegisterSection<AlbumOptimizationConfig>();
+
+			 App.WorkWith()
+				.DynamicData()
+					.Type(typeof(Image))
+						.Field()
+							 .TryCreateNew("Optimized", typeof(bool))
+							 .SaveChanges(true);
             }
         }
 

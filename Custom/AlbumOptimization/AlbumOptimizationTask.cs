@@ -10,6 +10,7 @@ using Telerik.Sitefinity.Libraries.Model;
 using Telerik.Sitefinity.Modules.Libraries;
 using Telerik.Sitefinity.Scheduling;
 using Telerik.Sitefinity.Workflow;
+using Telerik.Sitefinity.Model;
 using ImageMagick;
 
 namespace SitefinityWebApp.Custom.AlbumOptimization
@@ -54,14 +55,18 @@ namespace SitefinityWebApp.Custom.AlbumOptimization
 
 			var albumProvider = (LibrariesDataProvider)album.Provider;
 
-			var images = album.Images().Where(i => i.Status == ContentLifecycleStatus.Master);
-
+			var images = album.Images().Where(i => i.Status == ContentLifecycleStatus.Master && !i.GetValue<bool>("Optimized"));
 			_itemsCount = images.Count();
+
+			AlbumOptimizationConfig _albumOptimaztionConfig = Config.Get<AlbumOptimizationConfig>();
+			int _imageQuality = 100;
+			if (_albumOptimaztionConfig.ImageQuality != null)
+			{
+				_imageQuality = _albumOptimaztionConfig.ImageQuality;
+			}
 
 			foreach (Telerik.Sitefinity.Libraries.Model.Image image in images)
 			{
-
-
 				// Pull the Stream of the image from the provider.
 				// This saves us from having to care about BlobStorage
 				Stream imageData = albumProvider.Download(image);
@@ -69,7 +74,6 @@ namespace SitefinityWebApp.Custom.AlbumOptimization
 				using (MemoryStream compressed = new MemoryStream())
 				{
 					MagickReadSettings magickSettings = new MagickReadSettings();
-					Percentage p = 50;
 					switch (image.Extension)
 					{
 						case ".png":
@@ -90,8 +94,7 @@ namespace SitefinityWebApp.Custom.AlbumOptimization
 					}
 					using (MagickImage img = new MagickImage(imageData, magickSettings))
 					{
-						//img.Resize(new ImageMagick.MagickGeometry("50%"));
-						img.Quality = 60;
+						img.Quality = _imageQuality;
 						img.Write(compressed);
 						if (compressed == null)
 						{
@@ -105,6 +108,7 @@ namespace SitefinityWebApp.Custom.AlbumOptimization
 						//Make the modifications to the temp version.
 						_librariesManager.Upload(temp, compressed, image.Extension);
 
+						temp.SetValue("Optimized",true);
 						//Checkin the temp and get the updated master version.
 						//After the check in the temp version is deleted.
 						_librariesManager.Lifecycle.CheckIn(temp);
@@ -125,6 +129,7 @@ namespace SitefinityWebApp.Custom.AlbumOptimization
 
 				UpdateProgress();
 			}
+
 		}
 
 
